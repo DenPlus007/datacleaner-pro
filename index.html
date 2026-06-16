@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DataCleaner Pro · DEN</title>
+  <meta name="description" content="Limpieza y filtrado avanzado de archivos Excel y CSV. Sin servidor, todo en el navegador.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-50: #EEEDFE; --purple-100: #CECBF6; --purple-200: #AFA9EC;
+      --purple-400: #7F77DD; --purple-600: #534AB7; --purple-800: #3C3489; --purple-900: #26215C;
+      --amber-50: #FAEEDA; --amber-100: #FAC775; --amber-400: #BA7517; --amber-600: #854F0B;
+      --green-50: #EAF3DE; --green-200: #C0DD97; --green-600: #3B6D11; --green-800: #27500A;
+      --red-50: #FCEBEB; --red-200: #F09595; --red-600: #A32D2D;
+      --teal-50: #E1F5EE; --teal-200: #5DCAA5; --teal-600: #0F6E56;
+      --gray-50: #F8F8F6; --gray-100: #F1EFE8; --gray-200: #D3D1C7;
+      --gray-400: #888780; --gray-600: #5F5E5A; --gray-800: #444441; --gray-900: #2C2C2A;
+
+      --bg: #f5f5f2;
+      --surface: #ffffff;
+      --surface-2: #f8f8f6;
+      --border: rgba(0,0,0,0.10);
+      --border-md: rgba(0,0,0,0.18);
+      --text: #1a1a18;
+      --text-2: #5f5e5a;
+      --text-3: #9e9d97;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a18; --surface: #242422; --surface-2: #2e2e2b;
+        --border: rgba(255,255,255,0.10); --border-md: rgba(255,255,255,0.18);
+        --text: #f0efea; --text-2: #b4b2a9; --text-3: #6b6a64;
+        --purple-50: #26215C; --purple-100: #3C3489; --purple-200: #534AB7;
+        --purple-600: #AFA9EC; --purple-800: #CECBF6;
+        --green-50: #173404; --green-200: #3B6D11; --green-600: #C0DD97; --green-800: #EAF3DE;
+        --amber-50: #412402; --amber-400: #FAC775;
+        --red-50: #501313; --red-200: #A32D2D; --red-600: #F09595;
+        --shadow: 0 1px 3px rgba(0,0,0,0.3);
+      }
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    a { color: var(--purple-400); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ── */
+    .app-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+
+    /* ── Header ── */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow);
+    }
+    .top-bar-left { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      width: 38px; height: 38px;
+      background: var(--purple-600); color: #fff;
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .brand-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .brand-sub  { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+    .top-bar-right { display: flex; align-items: center; gap: 8px; }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 7px 13px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 500;
+      cursor: pointer; border: 0.5px solid var(--border-md);
+      background: var(--surface); color: var(--text);
+      transition: background 0.12s, border-color 0.12s;
+      white-space: nowrap;
+    }
+    .btn:hover { background: var(--surface-2); }
+    .btn i { font-size: 15px; }
+    .btn-primary { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+    .btn-primary:hover { background: var(--purple-800); border-color: var(--purple-800); }
+    .btn-success { background: var(--green-50); color: var(--green-600); border-color: var(--green-200); }
+    .btn-success:hover { background: var(--green-200); }
+    .btn-warn    { background: var(--amber-50); color: var(--amber-400); border-color: var(--amber-100); }
+    .btn-warn:hover { background: var(--amber-100); }
+    .btn-danger  { background: var(--red-50); color: var(--red-600); border-color: var(--red-200); }
+    .btn-danger:hover { background: var(--red-200); }
+    .btn-sm { padding: 5px 10px; font-size: 12px; }
+    .btn-sm i { font-size: 13px; }
+    .btn-full { width: 100%; justify-content: center; }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      border: 2px dashed var(--border-md);
+      border-radius: var(--radius-lg);
+      padding: 4rem 2rem;
+      text-align: center;
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      box-shadow: var(--shadow);
+    }
+    .drop-zone:hover, .drop-zone.drag-over {
+      border-color: var(--purple-400);
+      background: var(--purple-50);
+    }
+    .drop-zone .dz-icon { font-size: 48px; color: var(--text-3); display: block; margin-bottom: 1rem; }
+    .drop-zone h2 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+    .drop-zone p  { font-size: 13px; color: var(--text-2); margin-bottom: 4px; }
+    .drop-zone small { font-size: 12px; color: var(--text-3); }
+    .drop-zone label { cursor: pointer; }
+
+    /* ── Workspace ── */
+    .workspace {
+      display: grid;
+      grid-template-columns: 290px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+    }
+    .sidebar { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── Panel ── */
+    .panel {
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      box-shadow: var(--shadow);
+    }
+    .panel-title {
+      font-size: 11px; font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .panel-title i { font-size: 15px; }
+    .sep { border-top: 0.5px solid var(--border); margin: 12px 0; }
+
+    /* ── Forms ── */
+    select, input[type=text] {
+      width: 100%; padding: 7px 10px;
+      font-size: 13px; font-family: inherit;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius);
+      background: var(--surface); color: var(--text);
+      transition: border-color 0.12s, box-shadow 0.12s;
+    }
+    select:focus, input:focus {
+      outline: none; border-color: var(--purple-400);
+      box-shadow: 0 0 0 3px var(--purple-50);
+    }
+    input:disabled { opacity: 0.45; cursor: not-allowed; }
+    .form-stack { display: flex; flex-direction: column; gap: 7px; }
+
+    /* ── Stats ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 10px; }
+    .stat-card { background: var(--surface-2); border-radius: var(--radius); padding: 10px 12px; }
+    .stat-label { font-size: 11px; color: var(--text-3); margin-bottom: 3px; }
+    .stat-val   { font-size: 22px; font-weight: 600; color: var(--text); }
+    .stat-val.c-purple { color: var(--purple-400); }
+    .stat-val.c-amber  { color: var(--amber-400); }
+    .stat-file { font-size: 11px; color: var(--text-3); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── Logic toggle ── */
+    .logic-row {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: var(--text-2); margin: 10px 0 6px;
+    }
+    .logic-row label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .badge {
+      display: inline-block; padding: 2px 8px;
+      border-radius: 99px; font-size: 11px; font-weight: 600;
+    }
+    .badge-and { background: var(--purple-50); color: var(--purple-800); }
+    .badge-or  { background: var(--amber-50);  color: var(--amber-600); }
+
+    /* ── Filter tags ── */
+    .filter-tag {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--purple-50); border: 0.5px solid var(--purple-200);
+      border-radius: var(--radius); padding: 6px 10px;
+      font-size: 12px; color: var(--purple-800); gap: 6px;
+    }
+    .filter-tag .tag-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .empty-msg { font-size: 12px; color: var(--text-3); font-style: italic; text-align: center; padding: 6px 0; }
+
+    /* ── Column pills ── */
+    .col-pills { display: flex; flex-wrap: wrap; gap: 5px; }
+    .col-pill {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 3px 10px; border-radius: 99px; font-size: 12px;
+      border: 0.5px solid var(--border-md); cursor: pointer;
+      background: var(--surface-2); color: var(--text-2);
+      transition: all 0.12s; user-select: none;
+    }
+    .col-pill.on { background: var(--purple-50); border-color: var(--purple-200); color: var(--purple-800); }
+
+    /* ── Clean actions ── */
+    .clean-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    /* ── Table ── */
+    .tbl-panel { display: flex; flex-direction: column; }
+    .tbl-toolbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 10px; flex-wrap: wrap; gap: 6px;
+    }
+    .tbl-toolbar-left { font-size: 13px; font-weight: 500; color: var(--text-2); }
+    .export-row { display: flex; gap: 6px; }
+    .tbl-wrap {
+      overflow-x: auto; max-height: 380px; overflow-y: auto;
+      border: 0.5px solid var(--border); border-radius: var(--radius);
+    }
+    table { width: 100%; font-size: 12px; border-collapse: collapse; table-layout: fixed; }
+    thead { position: sticky; top: 0; z-index: 2; }
+    th {
+      padding: 8px 10px;
+      background: var(--surface-2); color: var(--text-2);
+      font-weight: 600; font-size: 11px; text-align: left;
+      border-bottom: 0.5px solid var(--border-md);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      min-width: 80px; max-width: 180px;
+    }
+    td {
+      padding: 7px 10px;
+      border-bottom: 0.5px solid var(--border);
+      color: var(--text); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis; max-width: 180px;
+    }
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover td { background: var(--surface-2); }
+    .empty-cell { color: var(--text-3); font-style: italic; }
+    .no-data { text-align: center; padding: 2.5rem; color: var(--text-3); font-style: italic; }
+
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 8px; margin-top: 10px;
+    }
+    .pg-info { font-size: 12px; color: var(--text-2); min-width: 60px; text-align: center; }
+    .pg-total { font-size: 12px; color: var(--text-3); }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 100;
+      background: var(--gray-900); color: #fff;
+      padding: 10px 16px; border-radius: var(--radius);
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; margin-top: 2rem;
+      font-size: 11px; color: var(--text-3);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      .workspace { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    .hidden { display: none !important; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+
+    /* ── Caracteres especiales ── */
+    .char-scan-grid { display: flex; flex-direction: column; gap: 6px; }
+    .char-col-row {
+      background: var(--surface-2);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+    }
+    .char-col-name {
+      font-size: 12px; font-weight: 600; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+    .char-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .char-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 7px; border-radius: 99px; font-size: 11px; font-weight: 500;
+      cursor: pointer; border: 0.5px solid transparent;
+      transition: opacity 0.12s;
+    }
+    .char-tag:hover { opacity: 0.75; }
+    .char-tag.t-ctrl  { background: var(--red-50);    color: var(--red-600);    border-color: var(--red-200); }
+    .char-tag.t-zero  { background: var(--amber-50);  color: var(--amber-600);  border-color: var(--amber-100); }
+    .char-tag.t-latin { background: var(--purple-50); color: var(--purple-800); border-color: var(--purple-200); }
+    .char-tag.t-punc  { background: var(--teal-50);   color: var(--teal-600);   border-color: var(--teal-200); }
+    .char-tag.t-emoji { background: var(--green-50);  color: var(--green-600);  border-color: var(--green-200); }
+    .char-tag.t-other { background: var(--gray-100);  color: var(--gray-600);   border-color: var(--gray-200); }
+    .char-tag .ct-count {
+      background: rgba(0,0,0,0.10); border-radius: 99px;
+      padding: 0 5px; font-size: 10px;
+    }
+    .char-scan-empty { font-size: 12px; color: var(--text-3); font-style: italic; text-align: center; padding: 10px 0; }
+
+    /* highlight en tabla */
+    td.has-special { background: rgba(186,117,23,0.10); }
+    td.has-special mark {
+      background: rgba(186,117,23,0.30);
+      color: inherit; border-radius: 2px; padding: 0 1px;
+    }
+    tbody tr:hover td.has-special { background: rgba(186,117,23,0.18); }
+
+    .scan-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+    /* modal de detalle */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-box {
+      background: var(--surface);
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem 1.5rem;
+      width: min(520px, 92vw);
+      max-height: 80vh; overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    }
+    .modal-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-table { width: 100%; font-size: 12px; border-collapse: collapse; }
+    .modal-table th { padding: 6px 10px; background: var(--surface-2); font-weight: 600; font-size: 11px; text-align: left; border-bottom: 0.5px solid var(--border-md); }
+    .modal-table td { padding: 6px 10px; border-bottom: 0.5px solid var(--border); font-family: var(--font-mono, monospace); }
+    .modal-table tr:last-child td { border-bottom: none; }
+    .char-preview { background: var(--red-50); color: var(--red-600); border-radius: 3px; padding: 1px 4px; font-size: 11px; }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+  <h1 class="sr-only">DataCleaner Pro — limpieza y filtrado de archivos Excel y CSV</h1>
+
+  <!-- Header -->
+  <header class="top-bar">
+    <div class="top-bar-left">
+      <div class="brand-icon"><i class="ti ti-database-cog"></i></div>
+      <div>
+        <div class="brand-name">DataCleaner Pro</div>
+        <div class="brand-sub">Excel · CSV — filtrar, limpiar y exportar sin servidor</div>
+      </div>
+    </div>
+    <div class="top-bar-right">
+      <button class="btn btn-sm hidden" id="btn-reset">
+        <i class="ti ti-refresh"></i> Nuevo archivo
+      </button>
+    </div>
+  </header>
+
+  <!-- Drop zone -->
+  <div id="drop-zone" class="drop-zone" role="region" aria-label="Zona de carga de archivo">
+    <input type="file" id="file-input" accept=".csv,.xlsx,.xls" class="sr-only" aria-label="Seleccionar archivo Excel o CSV">
+    <label for="file-input">
+      <i class="ti ti-upload dz-icon" aria-hidden="true"></i>
+      <h2>Arrastrá tu archivo aquí</h2>
+      <p>o hacé clic para buscarlo</p>
+      <small>Formatos aceptados: .xlsx &middot; .xls &middot; .csv</small>
+    </label>
+  </div>
+
+  <!-- Workspace -->
+  <div id="workspace" class="hidden">
+    <div class="workspace">
+
+      <!-- ── Sidebar ── -->
+      <aside class="sidebar">
+
+        <!-- Estadísticas -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-chart-bar"></i> Resumen</div>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Total</div>
+              <div class="stat-val" id="st-total">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Filtradas</div>
+              <div class="stat-val c-purple" id="st-filtered">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Duplic.</div>
+              <div class="stat-val c-amber" id="st-dups">0</div>
+            </div>
+          </div>
+          <div class="stat-file" id="st-file"></div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-filter"></i> Filtros</div>
+          <div class="form-stack">
+            <select id="filter-col" aria-label="Columna a filtrar"></select>
+            <select id="filter-cond" aria-label="Condición">
+              <option value="contains">Contiene</option>
+              <option value="not_contains">No contiene</option>
+              <option value="equals">Es igual a</option>
+              <option value="not_equals">No es igual a</option>
+              <option value="starts_with">Empieza con</option>
+              <option value="ends_with">Termina con</option>
+              <option value="is_empty">Está vacío</option>
+              <option value="is_not_empty">No está vacío</option>
+              <option value="gt">Mayor que (número)</option>
+              <option value="lt">Menor que (número)</option>
+            </select>
+            <input type="text" id="filter-val" placeholder="Valor del filtro..." aria-label="Valor">
+          </div>
+
+          <div class="logic-row">
+            <span>Combinar:</span>
+            <label><input type="radio" name="logic" value="AND" checked> <span class="badge badge-and">AND</span></label>
+            <label><input type="radio" name="logic" value="OR"> <span class="badge badge-or">OR</span></label>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="add-filter">
+            <i class="ti ti-plus"></i> Agregar filtro
+          </button>
+
+          <div class="sep"></div>
+          <div id="active-filters"><p class="empty-msg">Sin filtros activos</p></div>
+          <button class="btn btn-danger btn-full btn-sm hidden" id="clear-all" style="margin-top:8px;">
+            <i class="ti ti-x"></i> Limpiar todos los filtros
+          </button>
+        </div>
+
+        <!-- Limpieza rápida -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-wand"></i> Limpieza rápida</div>
+          <div style="margin-bottom:8px;">
+            <select id="clean-col" aria-label="Columna objetivo">
+              <option value="__all__">— Todas las columnas —</option>
+            </select>
+          </div>
+          <div class="clean-grid">
+            <button class="btn btn-sm" id="btn-trim"><i class="ti ti-eraser"></i> Trim</button>
+            <button class="btn btn-sm" id="btn-upper"><i class="ti ti-arrow-big-up"></i> MAYÚSC.</button>
+            <button class="btn btn-sm" id="btn-lower"><i class="ti ti-arrow-big-down"></i> minúsc.</button>
+            <button class="btn btn-sm" id="btn-proper"><i class="ti ti-text-size"></i> Capitalizar</button>
+            <button class="btn btn-warn btn-sm" id="btn-dedup"><i class="ti ti-copy-off"></i> Quitar duplicados</button>
+            <button class="btn btn-danger btn-sm" id="btn-del-empty"><i class="ti ti-trash"></i> Filas vacías</button>
+          </div>
+        </div>
+
+        <!-- Columnas visibles -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-columns"></i> Columnas visibles</div>
+          <div class="col-pills" id="col-visibility"></div>
+        </div>
+
+        <!-- Caracteres especiales -->
+        <div class="panel">
+          <div class="panel-title"><i class="ti ti-zoom-code"></i> Caracteres especiales</div>
+          <button class="btn btn-full btn-sm" id="btn-scan" style="margin-bottom:10px;">
+            <i class="ti ti-scan"></i> Escanear datos
+          </button>
+          <div id="char-scan-results">
+            <p class="char-scan-empty">Presioná "Escanear" para detectar<br>caracteres raros en el dataset.</p>
+          </div>
+          <div class="scan-actions hidden" id="scan-actions">
+            <div class="sep" style="width:100%; margin:4px 0;"></div>
+            <p style="font-size:11px; color:var(--text-3); width:100%; margin-bottom:2px;">Aplicar a toda la tabla:</p>
+            <button class="btn btn-sm btn-warn" id="btn-clean-ctrl">
+              <i class="ti ti-backspace"></i> Quitar control
+            </button>
+            <button class="btn btn-sm btn-warn" id="btn-clean-zero">
+              <i class="ti ti-circle-off"></i> Quitar ancho-cero
+            </button>
+            <button class="btn btn-sm btn-warn" id="btn-clean-emoji">
+              <i class="ti ti-mood-off"></i> Quitar emojis
+            </button>
+            <button class="btn btn-sm btn-danger" id="btn-clean-all-special">
+              <i class="ti ti-sparkles-off"></i> Limpiar todo
+            </button>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ── Main table panel ── -->
+      <main class="panel tbl-panel">
+        <div class="tbl-toolbar">
+          <span class="tbl-toolbar-left" id="tbl-label">Vista previa</span>
+          <div class="export-row">
+            <button class="btn btn-success btn-sm" id="exp-csv">
+              <i class="ti ti-file-text"></i> Exportar CSV
+            </button>
+            <button class="btn btn-success btn-sm" id="exp-excel">
+              <i class="ti ti-file-spreadsheet"></i> Exportar Excel
+            </button>
+          </div>
+        </div>
+
+        <div class="tbl-wrap" role="region" aria-label="Tabla de datos" tabindex="0">
+          <table id="main-table" aria-live="polite">
+            <thead id="tbl-head"></thead>
+            <tbody id="tbl-body"></tbody>
+          </table>
+        </div>
+
+        <div class="pagination">
+          <button class="btn btn-sm" id="pg-prev" aria-label="Página anterior"><i class="ti ti-chevron-left"></i></button>
+          <span class="pg-info" id="pg-info">1 / 1</span>
+          <button class="btn btn-sm" id="pg-next" aria-label="Página siguiente"><i class="ti ti-chevron-right"></i></button>
+          <span class="pg-total" id="pg-total"></span>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <footer>
+    DataCleaner Pro &mdash; Todo el procesamiento ocurre en tu navegador. Ningún dato sale de tu equipo.
+    &nbsp;|&nbsp; Desarrollado por <a href="https://github.com/denplus007" target="_blank" rel="noopener">DEN</a>
+  </footer>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function() {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+  s.onload = initApp;
+  document.head.appendChild(s);
+})();
+
+function initApp() {
+(function () {
+  'use strict';
+
+  /* ── State ── */
+  const PAGE_SIZE = 50;
+  let originalData  = [];
+  let headers       = [];
+  let activeFilters = [];
+  let visibleCols   = [];
+  let filteredData  = [];
+  let currentPage   = 1;
+  let fileName      = '';
+
+  /* ── Utils ── */
+  const $ = id => document.getElementById(id);
+
+  function toast(msg, ms = 2200) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  /* ── Col visibility ── */
+  function renderColVisibility() {
+    const c = $('col-visibility');
+    c.innerHTML = '';
+    headers.forEach(h => {
+      const on = visibleCols.includes(h);
+      const pill = document.createElement('div');
+      pill.className = 'col-pill' + (on ? ' on' : '');
+      pill.textContent = h;
+      pill.title = h;
+      pill.setAttribute('role', 'checkbox');
+      pill.setAttribute('aria-checked', on ? 'true' : 'false');
+      pill.setAttribute('tabindex', '0');
+      const toggle = () => {
+        if (visibleCols.includes(h)) {
+          if (visibleCols.length > 1) visibleCols = visibleCols.filter(x => x !== h);
+          else { toast('Debe quedar al menos una columna visible.'); return; }
+        } else {
+          visibleCols.push(h);
+        }
+        renderColVisibility();
+        updateTable();
+      };
+      pill.onclick = toggle;
+      pill.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); } };
+      c.appendChild(pill);
+    });
+
+    /* Sync clean-col select */
+    const sel = $('clean-col');
+    sel.innerHTML = '<option value="__all__">— Todas las columnas —</option>';
+    headers.forEach(h => sel.innerHTML += `<option value="${h}">${h}</option>`);
+  }
+
+  /* ── Filter logic ── */
+  function getLogic() {
+    return document.querySelector('input[name="logic"]:checked').value;
+  }
+
+  function applyFilters(data) {
+    if (!activeFilters.length) return data;
+    const logic = getLogic();
+    return data.filter(row => {
+      const results = activeFilters.map(f => {
+        const rawVal = row[f.col] == null ? '' : row[f.col];
+        const val    = String(rawVal).toLowerCase();
+        const target = f.val.toLowerCase();
+        switch (f.cond) {
+          case 'contains':     return val.includes(target);
+          case 'not_contains': return !val.includes(target);
+          case 'equals':       return val === target;
+          case 'not_equals':   return val !== target;
+          case 'starts_with':  return val.startsWith(target);
+          case 'ends_with':    return val.endsWith(target);
+          case 'is_empty':     return val.trim() === '';
+          case 'is_not_empty': return val.trim() !== '';
+          case 'gt':           return parseFloat(rawVal) > parseFloat(f.val);
+          case 'lt':           return parseFloat(rawVal) < parseFloat(f.val);
+          default:             return true;
+        }
+      });
+      return logic === 'AND' ? results.every(Boolean) : results.some(Boolean);
+    });
+  }
+
+  function countDuplicates(data) {
+    const seen = new Set(), dups = new Set();
+    data.forEach((row, i) => {
+      const key = headers.map(h => String(row[h] ?? '')).join('\x00');
+      if (seen.has(key)) dups.add(i);
+      seen.add(key);
+    });
+    return dups.size;
+  }
+
+  /* ── Stats ── */
+  function updateStats() {
+    $('st-total').textContent    = originalData.length.toLocaleString('es-AR');
+    $('st-filtered').textContent = filteredData.length.toLocaleString('es-AR');
+    $('st-dups').textContent     = countDuplicates(filteredData).toLocaleString('es-AR');
+  }
+
+  /* ── Table render ── */
+  function updateTable() {
+    filteredData = applyFilters(originalData);
+    updateStats();
+
+    const totalPages = Math.max(1, Math.ceil(filteredData.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+
+    const start    = (currentPage - 1) * PAGE_SIZE;
+    const pageData = filteredData.slice(start, start + PAGE_SIZE);
+    const cols     = visibleCols.filter(h => headers.includes(h));
+
+    $('pg-info').textContent  = `${currentPage} / ${totalPages}`;
+    $('pg-total').textContent = `${filteredData.length.toLocaleString('es-AR')} filas`;
+    $('tbl-label').textContent = `Vista previa — pág. ${currentPage} de ${totalPages}`;
+
+    /* Head */
+    $('tbl-head').innerHTML =
+      `<tr>${cols.map(h => `<th title="${esc(h)}">${esc(h)}</th>`).join('')}</tr>`;
+
+    /* Body */
+    if (!pageData.length) {
+      $('tbl-body').innerHTML =
+        `<tr><td colspan="${cols.length}" class="no-data">Sin resultados para los filtros actuales</td></tr>`;
+      return;
+    }
+    $('tbl-body').innerHTML = pageData.map(row => {
+      const cells = cols.map(h => {
+        const v = row[h] == null ? '' : row[h];
+        const str = String(v);
+        const isEmpty = str.trim() === '';
+        if (isEmpty) return `<td class="empty-cell" title="">—</td>`;
+
+        // Highlight mode: marcar caracteres especiales
+        if (highlightActive && lastScan && lastScan[h]) {
+          const hasSpecial = Object.keys(lastScan[h]).length > 0;
+          if (hasSpecial) {
+            // Construir regex de todos los chars especiales detectados en esta columna
+            const cps = new Set();
+            Object.values(lastScan[h]).forEach(info => info.chars.forEach((_, cp) => cps.add(cp)));
+            let marked = '';
+            for (const ch of str) {
+              const cp = ch.codePointAt(0);
+              if (cps.has(cp)) {
+                const safe = cp >= 0x20 && cp !== 0x7F ? esc(ch) : '\u25A0';
+                marked += `<mark title="U+${cp.toString(16).toUpperCase().padStart(4,'0')}">${safe}</mark>`;
+              } else {
+                marked += esc(ch);
+              }
+            }
+            return `<td class="has-special" title="${esc(str)}">${marked}</td>`;
+          }
+        }
+        return `<td title="${esc(str)}">${esc(str)}</td>`;
+      }).join('');
+      return `<tr>${cells}</tr>`;
+    }).join('');
+  }
+
+  function esc(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  /* ── Render active filters ── */
+  const COND_LABEL = {
+    contains:'contiene', not_contains:'no contiene',
+    equals:'=', not_equals:'≠',
+    starts_with:'empieza con', ends_with:'termina con',
+    is_empty:'está vacío', is_not_empty:'no está vacío',
+    gt:'>', lt:'<'
+  };
+
+  function renderFilters() {
+    const c = $('active-filters');
+    if (!activeFilters.length) {
+      c.innerHTML = '<p class="empty-msg">Sin filtros activos</p>';
+      $('clear-all').classList.add('hidden');
+      return;
+    }
+    $('clear-all').classList.remove('hidden');
+    c.innerHTML = activeFilters.map((f, i) => `
+      <div class="filter-tag">
+        <span class="tag-text"><strong>${esc(f.col)}</strong> ${COND_LABEL[f.cond]}${f.val ? ' "' + esc(f.val) + '"' : ''}</span>
+        <button class="btn btn-danger btn-sm" onclick="removeFilter(${i})" aria-label="Eliminar filtro">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>`).join('');
+  }
+
+  window.removeFilter = (i) => {
+    activeFilters.splice(i, 1);
+    renderFilters();
+    currentPage = 1;
+    updateTable();
+  };
+
+  /* ── Add filter ── */
+  $('add-filter').onclick = () => {
+    const col  = $('filter-col').value;
+    const cond = $('filter-cond').value;
+    const val  = $('filter-val').value.trim();
+    const noValConds = ['is_empty', 'is_not_empty'];
+    if (!noValConds.includes(cond) && !val) {
+      $('filter-val').focus();
+      return;
+    }
+    activeFilters.push({ col, cond, val });
+    $('filter-val').value = '';
+    renderFilters();
+    currentPage = 1;
+    updateTable();
+    toast('Filtro agregado');
+  };
+
+  $('clear-all').onclick = () => {
+    activeFilters = [];
+    renderFilters();
+    currentPage = 1;
+    updateTable();
+    toast('Filtros eliminados');
+  };
+
+  /* ── Pagination ── */
+  $('pg-prev').onclick = () => {
+    if (currentPage > 1) { currentPage--; updateTable(); }
+  };
+  $('pg-next').onclick = () => {
+    const tp = Math.ceil(filteredData.length / PAGE_SIZE);
+    if (currentPage < tp) { currentPage++; updateTable(); }
+  };
+
+  document.querySelectorAll('input[name="logic"]').forEach(r => {
+    r.onchange = () => { currentPage = 1; updateTable(); };
+  });
+
+  /* ── Condition → disable val input ── */
+  const NO_VAL_CONDS = ['is_empty', 'is_not_empty'];
+  $('filter-cond').onchange = () => {
+    const disable = NO_VAL_CONDS.includes($('filter-cond').value);
+    $('filter-val').disabled = disable;
+    if (disable) $('filter-val').value = '';
+  };
+
+  /* ── Cleaning operations ── */
+  function applyClean(fn) {
+    const col = $('clean-col').value;
+    originalData = originalData.map(row => {
+      const r = { ...row };
+      if (col === '__all__') {
+        headers.forEach(h => { if (r[h] != null) r[h] = fn(String(r[h])); });
+      } else {
+        if (r[col] != null) r[col] = fn(String(r[col]));
+      }
+      return r;
+    });
+    currentPage = 1;
+    updateTable();
+  }
+
+  function toProper(str) {
+    return str.toLowerCase().replace(/(?:^|\s)\S/g, c => c.toUpperCase());
+  }
+
+  $('btn-trim').onclick   = () => { applyClean(v => v.trim()); toast('Espacios eliminados'); };
+  $('btn-upper').onclick  = () => { applyClean(v => v.toUpperCase()); toast('Texto en mayúsculas'); };
+  $('btn-lower').onclick  = () => { applyClean(v => v.toLowerCase()); toast('Texto en minúsculas'); };
+  $('btn-proper').onclick = () => { applyClean(v => toProper(v)); toast('Texto capitalizado'); };
+
+  $('btn-dedup').onclick = () => {
+    const before = originalData.length;
+    const seen = new Set();
+    originalData = originalData.filter(row => {
+      const key = headers.map(h => String(row[h] ?? '')).join('\x00');
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    });
+    const removed = before - originalData.length;
+    currentPage = 1;
+    updateTable();
+    toast(`${removed} fila${removed !== 1 ? 's' : ''} duplicada${removed !== 1 ? 's' : ''} eliminada${removed !== 1 ? 's' : ''}`);
+  };
+
+  $('btn-del-empty').onclick = () => {
+    const before = originalData.length;
+    originalData = originalData.filter(row =>
+      headers.some(h => String(row[h] ?? '').trim() !== '')
+    );
+    const removed = before - originalData.length;
+    currentPage = 1;
+    updateTable();
+    toast(`${removed} fila${removed !== 1 ? 's' : ''} vacía${removed !== 1 ? 's' : ''} eliminada${removed !== 1 ? 's' : ''}`);
+  };
+
+  /* ── Export ── */
+  function exportData(format) {
+    const cols = visibleCols.filter(h => headers.includes(h));
+    const data = filteredData.map(row => {
+      const r = {};
+      cols.forEach(h => r[h] = row[h] ?? '');
+      return r;
+    });
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Datos');
+    const base   = fileName.replace(/\.[^.]+$/, '') || 'datos';
+    const suffix = activeFilters.length ? '_filtrado' : '_limpio';
+    if (format === 'csv') {
+      XLSX.writeFile(wb, `${base}${suffix}.csv`, { bookType: 'csv', FS: ';' });
+    } else {
+      XLSX.writeFile(wb, `${base}${suffix}.xlsx`);
+    }
+    toast(`Exportado: ${base}${suffix}.${format === 'csv' ? 'csv' : 'xlsx'}`);
+  }
+
+  $('exp-csv').onclick   = () => exportData('csv');
+  $('exp-excel').onclick = () => exportData('xlsx');
+  $('btn-reset').onclick = () => location.reload();
+
+  /* ── File loading ── */
+  function loadFile(file) {
+    if (!file) return;
+    fileName = file.name;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'array', codepage: 65001 });
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        originalData = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        if (!originalData.length) { toast('El archivo está vacío o no tiene filas de datos.'); return; }
+
+        headers     = Object.keys(originalData[0]);
+        visibleCols = [...headers];
+        activeFilters = [];
+        currentPage   = 1;
+
+        /* Populate filter col select */
+        const sel = $('filter-col');
+        sel.innerHTML = headers.map(h => `<option value="${esc(h)}">${esc(h)}</option>`).join('');
+
+        $('st-file').textContent = `${file.name}  ·  hoja: ${wb.SheetNames[0]}  ·  ${headers.length} columnas`;
+
+        $('drop-zone').classList.add('hidden');
+        $('workspace').classList.remove('hidden');
+        $('btn-reset').classList.remove('hidden');
+
+        renderColVisibility();
+        renderFilters();
+        updateTable();
+      } catch (err) {
+        console.error(err);
+        toast('Error al leer el archivo. Verificá que sea un Excel o CSV válido.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  /* ══════════════════════════════════════════════════
+     MÓDULO: DETECCIÓN Y LIMPIEZA DE CARACTERES ESPECIALES
+     ══════════════════════════════════════════════════ */
+
+  /* Categorías de caracteres */
+  const CHAR_CATEGORIES = [
+    {
+      id: 'ctrl',
+      label: 'Control / invisibles',
+      cls: 't-ctrl',
+      icon: '\u26A0',
+      test: cp => (cp < 0x20 && cp !== 0x09 && cp !== 0x0A && cp !== 0x0D) || cp === 0x7F || (cp >= 0x80 && cp <= 0x9F),
+      clean: function(s) {
+        let r = '';
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          const isCtrl = (cp < 0x20 && cp !== 0x09 && cp !== 0x0A && cp !== 0x0D) || cp === 0x7F || (cp >= 0x80 && cp <= 0x9F);
+          if (!isCtrl) r += ch;
+        }
+        return r;
+      }
+    },
+    {
+      id: 'zero',
+      label: 'Ancho cero / BOM',
+      cls: 't-zero',
+      icon: '\u00B7',
+      test: cp => cp === 0xFEFF || cp === 0x200B || cp === 0x200C || cp === 0x200D || cp === 0x2060 || cp === 0x00AD || cp === 0xFFFD,
+      clean: function(s) {
+        let r = '';
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          if (cp !== 0xFEFF && cp !== 0x200B && cp !== 0x200C && cp !== 0x200D && cp !== 0x2060 && cp !== 0x00AD && cp !== 0xFFFD) r += ch;
+        }
+        return r;
+      }
+    },
+    {
+      id: 'latin',
+      label: 'Latin extendido',
+      cls: 't-latin',
+      icon: 'Ã',
+      test: cp => cp >= 0x00C0 && cp <= 0x024F,
+      clean: function(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').normalize('NFC');
+      }
+    },
+    {
+      id: 'punc',
+      label: 'Puntuación tipográfica',
+      cls: 't-punc',
+      icon: '\u201C\u2019',
+      test: cp => (cp >= 0x2000 && cp <= 0x206F) || cp === 0x00A0 || cp === 0x00AB || cp === 0x00BB || cp === 0x2018 || cp === 0x2019 || cp === 0x201C || cp === 0x201D || cp === 0x2013 || cp === 0x2014 || cp === 0x2026 || cp === 0x00B7,
+      clean: function(s) {
+        let r = '';
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          if      (cp === 0x2018 || cp === 0x2019) r += "'";
+          else if (cp === 0x201C || cp === 0x201D) r += '"';
+          else if (cp === 0x2013)                  r += '-';
+          else if (cp === 0x2014)                  r += '--';
+          else if (cp === 0x2026)                  r += '...';
+          else if (cp === 0x00A0 || (cp >= 0x2000 && cp <= 0x200A)) r += ' ';
+          else if (cp === 0x00AB || cp === 0x00BB) r += '"';
+          else if (cp === 0x00B7)                  r += '.';
+          else r += ch;
+        }
+        return r;
+      }
+    },
+    {
+      id: 'emoji',
+      label: 'Emoji / símbolos',
+      cls: 't-emoji',
+      icon: '\uD83D\uDE00',
+      test: cp => cp >= 0x1F300 || (cp >= 0x2600 && cp <= 0x27BF),
+      clean: function(s) {
+        let r = '';
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          if (cp < 0x2600 || (cp > 0x27BF && cp < 0x1F300)) r += ch;
+        }
+        return r;
+      }
+    },
+    {
+      id: 'other',
+      label: 'Otros no-ASCII',
+      cls: 't-other',
+      icon: '?',
+      test: cp => cp > 0x024F && cp < 0x1F300
+            && !(cp >= 0x2000 && cp <= 0x206F)
+            && cp !== 0x00A0 && cp !== 0x00AB && cp !== 0x00BB
+            && cp !== 0x2018 && cp !== 0x2019 && cp !== 0x201C && cp !== 0x201D
+            && cp !== 0x2013 && cp !== 0x2014 && cp !== 0x2026 && cp !== 0x00B7
+            && !(cp >= 0x2600 && cp <= 0x27BF),
+      clean: function(s) {
+        let r = '';
+        for (const ch of s) {
+          const cp = ch.codePointAt(0);
+          r += (cp <= 0x024F || (cp >= 0x2600 && cp <= 0x27BF) || cp >= 0x1F300) ? ch : '?';
+        }
+        return r;
+      }
+    }
+  ];
+
+  /* Escanea un valor y devuelve hallazgos por categoría */
+  function scanValue(str) {
+    const found = {};
+    for (const ch of str) {
+      const cp = ch.codePointAt(0);
+      for (const cat of CHAR_CATEGORIES) {
+        if (cat.test(cp)) {
+          if (!found[cat.id]) found[cat.id] = { cat, chars: new Map() };
+          const key = cp;
+          found[cat.id].chars.set(key, (found[cat.id].chars.get(key) || 0) + 1);
+        }
+      }
+    }
+    return found;
+  }
+
+  /* Escanea toda la tabla y devuelve mapa col → { catId → {cat, chars, rows} } */
+  function scanAll() {
+    const result = {};
+    originalData.forEach((row, ri) => {
+      headers.forEach(h => {
+        const v = String(row[h] ?? '');
+        const found = scanValue(v);
+        if (Object.keys(found).length) {
+          if (!result[h]) result[h] = {};
+          for (const [catId, info] of Object.entries(found)) {
+            if (!result[h][catId]) result[h][catId] = { cat: info.cat, chars: new Map(), rows: [] };
+            info.chars.forEach((cnt, cp) => {
+              result[h][catId].chars.set(cp, (result[h][catId].chars.get(cp) || 0) + cnt);
+            });
+            result[h][catId].rows.push(ri);
+          }
+        }
+      });
+    });
+    return result;
+  }
+
+  let lastScan = null;   // cache del último escaneo
+  let highlightActive = false;
+
+  function renderScanResults(scan) {
+    const container = $('char-scan-results');
+    const cols = Object.keys(scan);
+
+    if (!cols.length) {
+      container.innerHTML = '<p class="char-scan-empty" style="color:var(--green-600)"><i class="ti ti-circle-check"></i> Sin caracteres especiales detectados.</p>';
+      $('scan-actions').classList.add('hidden');
+      return;
+    }
+
+    $('scan-actions').classList.remove('hidden');
+
+    container.innerHTML = '<div class="char-scan-grid">' +
+      cols.map(col => {
+        const cats = scan[col];
+        const tags = Object.entries(cats).map(([catId, info]) => {
+          const total = [...info.cat.chars ? info.chars.values() : info.chars.values()].reduce((a,b) => a+b, 0);
+          const totalOccurrences = [...info.chars.values()].reduce((a,b)=>a+b,0);
+          const rowCount = info.rows.length;
+          return `<span class="char-tag ${info.cat.cls}"
+            title="Categoría: ${info.cat.label}\nOcurrencias: ${totalOccurrences}\nFilas afectadas: ${rowCount}\nClic para ver detalle"
+            onclick="showCharDetail('${esc(col)}','${catId}')"
+          >${info.cat.label} <span class="ct-count">${rowCount} fil.</span></span>`;
+        }).join('');
+
+        return `<div class="char-col-row">
+          <div class="char-col-name" title="${esc(col)}"><i class="ti ti-table-column" style="font-size:12px;vertical-align:-1px"></i> ${esc(col)}</div>
+          <div class="char-tags">${tags}</div>
+        </div>`;
+      }).join('') + '</div>';
+
+    // Botón para resaltar en tabla
+    const existingBtn = $('btn-highlight-toggle');
+    if (!existingBtn) {
+      const hBtn = document.createElement('button');
+      hBtn.className = 'btn btn-sm';
+      hBtn.id = 'btn-highlight-toggle';
+      hBtn.innerHTML = '<i class="ti ti-highlight"></i> Resaltar en tabla';
+      hBtn.style.width = '100%';
+      hBtn.style.marginTop = '8px';
+      hBtn.onclick = toggleHighlight;
+      container.appendChild(hBtn);
+    }
+  }
+
+  function toggleHighlight() {
+    highlightActive = !highlightActive;
+    const btn = $('btn-highlight-toggle');
+    if (btn) {
+      btn.innerHTML = highlightActive
+        ? '<i class="ti ti-highlight-off"></i> Quitar resaltado'
+        : '<i class="ti ti-highlight"></i> Resaltar en tabla';
+      btn.className = highlightActive ? 'btn btn-sm btn-warn' : 'btn btn-sm';
+    }
+    updateTable();
+  }
+
+  /* Modal de detalle por columna+categoría */
+  window.showCharDetail = (col, catId) => {
+    if (!lastScan || !lastScan[col] || !lastScan[col][catId]) return;
+    const info = lastScan[col][catId];
+    const rows = info.rows.slice(0, 30);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+
+    const examples = rows.map(ri => {
+      const v = String(originalData[ri][col] ?? '');
+      return `<tr><td style="color:var(--text-2)">${ri + 1}</td><td>${esc(v.slice(0,80))}</td></tr>`;
+    }).join('');
+
+    const charList = [...info.chars.entries()]
+      .sort((a,b) => b[1]-a[1])
+      .slice(0, 20)
+      .map(([cp, cnt]) => {
+        const ch = String.fromCodePoint(cp);
+        const name = `U+${cp.toString(16).toUpperCase().padStart(4,'0')}`;
+        const isSafe = cp >= 0x20 && cp !== 0x7F;
+        return `<tr>
+          <td><span class="char-preview">${isSafe ? esc(ch) : '(ctrl)'}</span></td>
+          <td>${name}</td>
+          <td>${cnt}</td>
+          <td style="color:var(--text-3); font-size:11px;">${getCharName(cp)}</td>
+        </tr>`;
+      }).join('');
+
+    overlay.innerHTML = `
+      <div class="modal-box">
+        <div class="modal-title">
+          <span><i class="ti ti-zoom-code" style="vertical-align:-2px"></i> Detalle: ${esc(col)} — ${info.cat.label}</span>
+          <button class="btn btn-sm" onclick="this.closest('.modal-overlay').remove()"><i class="ti ti-x"></i></button>
+        </div>
+        <p style="font-size:12px; color:var(--text-2); margin-bottom:10px;">
+          ${info.rows.length} filas afectadas &middot; ${[...info.chars.values()].reduce((a,b)=>a+b,0)} ocurrencias totales
+        </p>
+        <p style="font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;">Caracteres encontrados</p>
+        <table class="modal-table" style="margin-bottom:14px;">
+          <thead><tr><th>Char</th><th>Unicode</th><th>Veces</th><th>Nombre</th></tr></thead>
+          <tbody>${charList}</tbody>
+        </table>
+        <p style="font-size:11px; font-weight:600; color:var(--text-3); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;">Primeras filas afectadas</p>
+        <table class="modal-table">
+          <thead><tr><th>#</th><th>Valor de celda</th></tr></thead>
+          <tbody>${examples}</tbody>
+        </table>
+        <div style="margin-top:14px; display:flex; gap:6px; justify-content:flex-end;">
+          <button class="btn btn-warn btn-sm" onclick="cleanColumn('${esc(col)}','${catId}'); this.closest('.modal-overlay').remove();">
+            <i class="ti ti-wand"></i> Limpiar esta columna
+          </button>
+          <button class="btn btn-sm" onclick="this.closest('.modal-overlay').remove()">Cerrar</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  };
+
+  function getCharName(cp) {
+    const names = {
+      0xFEFF:'BOM / Zero Width No-Break Space', 0x200B:'Zero Width Space',
+      0x200C:'Zero Width Non-Joiner', 0x200D:'Zero Width Joiner',
+      0x00A0:'No-Break Space', 0x00AD:'Soft Hyphen',
+      0x2018:'Left Single Quotation Mark', 0x2019:'Right Single Quotation Mark',
+      0x201C:'Left Double Quotation Mark', 0x201D:'Right Double Quotation Mark',
+      0x2013:'En Dash', 0x2014:'Em Dash', 0x2026:'Horizontal Ellipsis',
+      0xFFFD:'Replacement Character', 0x0000:'NULL', 0x0001:'SOH',
+      0x0009:'Tab', 0x000A:'Line Feed', 0x000D:'Carriage Return'
+    };
+    return names[cp] || (cp < 0x20 ? `Control 0x${cp.toString(16).toUpperCase()}` : '');
+  }
+
+  /* Limpieza por columna y categoría */
+  window.cleanColumn = (col, catId) => {
+    const cat = CHAR_CATEGORIES.find(c => c.id === catId);
+    if (!cat) return;
+    originalData = originalData.map(row => {
+      const r = { ...row };
+      if (r[col] != null) r[col] = cat.clean(String(r[col]));
+      return r;
+    });
+    runScan();
+    updateTable();
+    toast(`Limpiado: "${col}" — ${cat.label}`);
+  };
+
+  /* Limpieza global por categoría */
+  function cleanAllByCat(catId) {
+    const cat = CHAR_CATEGORIES.find(c => c.id === catId);
+    if (!cat) return;
+    originalData = originalData.map(row => {
+      const r = { ...row };
+      headers.forEach(h => { if (r[h] != null) r[h] = cat.clean(String(r[h])); });
+      return r;
+    });
+    runScan(); updateTable();
+    toast(`Limpieza completa: ${cat.label}`);
+  }
+
+  function cleanAllSpecial() {
+    originalData = originalData.map(row => {
+      const r = { ...row };
+      headers.forEach(h => {
+        if (r[h] != null) {
+          let v = String(r[h]);
+          CHAR_CATEGORIES.forEach(cat => { v = cat.clean(v); });
+          r[h] = v.trim();
+        }
+      });
+      return r;
+    });
+    runScan(); updateTable();
+    toast('Todos los caracteres especiales eliminados');
+  }
+
+  function runScan() {
+    lastScan = scanAll();
+    renderScanResults(lastScan);
+  }
+
+  $('btn-scan').onclick = runScan;
+  $('btn-clean-ctrl').onclick  = () => cleanAllByCat('ctrl');
+  $('btn-clean-zero').onclick  = () => cleanAllByCat('zero');
+  $('btn-clean-emoji').onclick = () => cleanAllByCat('emoji');
+  $('btn-clean-all-special').onclick = cleanAllSpecial;
+
+  /* ══════════════════════════════════════════════════
+     FIN MÓDULO CARACTERES ESPECIALES
+     ══════════════════════════════════════════════════ */
+
+  $('file-input').onchange = e => loadFile(e.target.files[0]);
+
+  /* Drag & drop */
+  const dz = $('drop-zone');
+  dz.addEventListener('dragover',  e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', ()  => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault();
+    dz.classList.remove('drag-over');
+    loadFile(e.dataTransfer.files[0]);
+  });
+
+  /* Keyboard shortcut: Enter on drop-zone label opens file dialog */
+  dz.querySelector('label').addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file-input').click(); }
+  });
+
+})();
+} // end initApp
+</script>
+</body>
+</html>
