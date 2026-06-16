@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -899,30 +900,25 @@ function initApp() {
         border-radius: var(--radius); font-size: 13px; color: var(--amber-400);
         display: flex; align-items: flex-start; gap: 10px; text-align: left;
       `;
-      warn.innerHTML = \`
-        <i class="ti ti-alert-triangle" style="font-size:18px; flex-shrink:0; margin-top:1px;" aria-hidden="true"></i>
-        <div>
-          <strong>Archivo demasiado grande: \${MB.toFixed(1)} MB</strong><br>
-          <span style="font-size:12px;">
-            El límite recomendado es <strong>\${LIMIT_MB} MB</strong>. Archivos más grandes pueden congelar o cerrar el navegador.<br>
-            Podés reducir el archivo antes de cargarlo: filtrá columnas o filas innecesarias con Python/Excel y volvé a intentarlo.
-          </span>
-          <div style="margin-top:8px; display:flex; gap:8px;">
-            <button onclick="proceedLoad()" style="
-              padding:5px 12px; border-radius:var(--radius); font-size:12px; font-weight:600;
-              background:var(--amber-50); color:var(--amber-400); border:0.5px solid var(--amber-100);
-              cursor:pointer;">
-              Cargar de todas formas
-            </button>
-            <button onclick="document.getElementById('dz-size-warn').remove(); window._pendingFile=null;" style="
-              padding:5px 12px; border-radius:var(--radius); font-size:12px;
-              background:var(--surface); color:var(--text-2); border:0.5px solid var(--border-md);
-              cursor:pointer;">
-              Cancelar
-            </button>
-          </div>
-        </div>
-      \`;
+      warn.innerHTML = [
+        '<i class="ti ti-alert-triangle" style="font-size:18px; flex-shrink:0; margin-top:1px;" aria-hidden="true"></i>',
+        '<div>',
+        '  <strong>Archivo demasiado grande: ' + MB.toFixed(1) + ' MB</strong><br>',
+        '  <span style="font-size:12px;">',
+        '    El l&iacute;mite recomendado es <strong>' + LIMIT_MB + ' MB</strong>.',
+        '    Archivos m&aacute;s grandes pueden congelar o cerrar el navegador.<br>',
+        '    Pod&eacute;s reducir el archivo con Python o Excel antes de cargarlo.',
+        '  </span>',
+        '  <div style="margin-top:8px; display:flex; gap:8px;">',
+        '    <button onclick="proceedLoad()" style="padding:5px 12px; border-radius:var(--radius); font-size:12px; font-weight:600; background:var(--amber-50); color:var(--amber-400); border:0.5px solid var(--amber-100); cursor:pointer;">',
+        '      Cargar de todas formas',
+        '    </button>',
+        '    <button onclick="document.getElementById(\'dz-size-warn\').remove(); window._pendingFile=null;" style="padding:5px 12px; border-radius:var(--radius); font-size:12px; background:var(--surface); color:var(--text-2); border:0.5px solid var(--border-md); cursor:pointer;">',
+        '      Cancelar',
+        '    </button>',
+        '  </div>',
+        '</div>'
+      ].join('');
       $('drop-zone').appendChild(warn);
       window._pendingFile = file;
       return;
