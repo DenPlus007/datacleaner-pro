@@ -884,6 +884,50 @@ function initApp() {
   /* ── File loading ── */
   function loadFile(file) {
     if (!file) return;
+
+    const MB = file.size / (1024 * 1024);
+    const LIMIT_MB = 80;
+
+    if (MB > LIMIT_MB) {
+      const dzWarn = $('dz-size-warn');
+      if (dzWarn) dzWarn.remove();
+      const warn = document.createElement('div');
+      warn.id = 'dz-size-warn';
+      warn.style.cssText = `
+        margin-top: 16px; padding: 14px 18px;
+        background: var(--amber-50); border: 0.5px solid var(--amber-100);
+        border-radius: var(--radius); font-size: 13px; color: var(--amber-400);
+        display: flex; align-items: flex-start; gap: 10px; text-align: left;
+      `;
+      warn.innerHTML = \`
+        <i class="ti ti-alert-triangle" style="font-size:18px; flex-shrink:0; margin-top:1px;" aria-hidden="true"></i>
+        <div>
+          <strong>Archivo demasiado grande: \${MB.toFixed(1)} MB</strong><br>
+          <span style="font-size:12px;">
+            El límite recomendado es <strong>\${LIMIT_MB} MB</strong>. Archivos más grandes pueden congelar o cerrar el navegador.<br>
+            Podés reducir el archivo antes de cargarlo: filtrá columnas o filas innecesarias con Python/Excel y volvé a intentarlo.
+          </span>
+          <div style="margin-top:8px; display:flex; gap:8px;">
+            <button onclick="proceedLoad()" style="
+              padding:5px 12px; border-radius:var(--radius); font-size:12px; font-weight:600;
+              background:var(--amber-50); color:var(--amber-400); border:0.5px solid var(--amber-100);
+              cursor:pointer;">
+              Cargar de todas formas
+            </button>
+            <button onclick="document.getElementById('dz-size-warn').remove(); window._pendingFile=null;" style="
+              padding:5px 12px; border-radius:var(--radius); font-size:12px;
+              background:var(--surface); color:var(--text-2); border:0.5px solid var(--border-md);
+              cursor:pointer;">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      \`;
+      $('drop-zone').appendChild(warn);
+      window._pendingFile = file;
+      return;
+    }
+
     fileName = file.name;
     const reader = new FileReader();
     reader.onload = e => {
@@ -1271,6 +1315,41 @@ function initApp() {
   dz.querySelector('label').addEventListener('keydown', e => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('file-input').click(); }
   });
+
+  window.proceedLoad = function() {
+    const f = window._pendingFile;
+    const warn = $('dz-size-warn');
+    if (warn) warn.remove();
+    window._pendingFile = null;
+    if (!f) return;
+    fileName = f.name;
+    toast('Cargando archivo grande... puede tardar unos segundos.');
+    setTimeout(() => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          const wb = XLSX.read(e.target.result, { type: 'array', codepage: 65001 });
+          const ws = wb.Sheets[wb.SheetNames[0]];
+          originalData = XLSX.utils.sheet_to_json(ws, { defval: '' });
+          if (!originalData.length) { toast('El archivo está vacío o no tiene filas de datos.'); return; }
+          headers     = Object.keys(originalData[0]);
+          visibleCols = [...headers];
+          activeFilters = []; currentPage = 1;
+          const sel = $('filter-col');
+          sel.innerHTML = headers.map(h => `<option value="${esc(h)}">${esc(h)}</option>`).join('');
+          $('st-file').textContent = `${f.name}  ·  hoja: ${wb.SheetNames[0]}  ·  ${headers.length} columnas`;
+          $('drop-zone').classList.add('hidden');
+          $('workspace').classList.remove('hidden');
+          $('btn-reset').classList.remove('hidden');
+          renderColVisibility(); renderFilters(); updateTable();
+        } catch(err) {
+          console.error(err);
+          toast('Error al leer el archivo. Verificá que sea un Excel o CSV válido.');
+        }
+      };
+      reader.readAsArrayBuffer(f);
+    }, 100);
+  };
 
 })();
 } // end initApp
