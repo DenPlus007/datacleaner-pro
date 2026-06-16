@@ -1,6 +1,6 @@
 # DataCleaner Pro
 
-Aplicación web para limpieza y filtrado de datos tabulares (Excel / CSV), desarrollada por [DEN · GeoFly](https://github.com/denplus007). Todo el procesamiento ocurre en el navegador — ningún dato sale del equipo.
+Aplicación web para limpieza y filtrado de datos tabulares (Excel / CSV), desarrollada por [DEN](https://github.com/denplus007). Todo el procesamiento ocurre en el navegador — ningún dato sale del equipo.
 
 ## Funcionalidades
 
